@@ -1,0 +1,17 @@
+.line{
+  stroke: #FF0000;
+  stroke-width: 3px;
+}
+
+.square{
+    stroke: #000;
+}
+
+.penalty{
+    position: absolute;
+    top: 200px;
+    left: 1100px;
+    width: 200px;
+    height: 47px;
+    border: 3px solid #73AD21;
+}

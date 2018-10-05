@@ -1,14 +1,24 @@
 /* File containing the default parameters values */
 
 //Grid 
-export const height = 20
-export const width = 20
+export const height = 21
+export const width = 21
 
-//Panalties
-export const minGridPenalty = 0;
-export const maxGridPenalty = 0.5
-export const crowdPenalty = 0.2
-export const straightPenalty = 0
-export const leftPenalty = 0.2
-export const rightPenalty = 0.2
-export const backPenalty = 0.4
+//Penalties
+export const minGridPen = 0;
+export const maxGridPen = 0.5
+export const crowdPen = 0.2
+export const rightPen = 0
+export const upPen = 0.1
+export const downPen = 0.1
+export const leftPen = 0.2
+
+
+//Svg
+export const scale =  50
+
+//Simulation
+export const steps = 40
+export const startSquares = [[6, 0], [13, 0]]
+export const delay = 500 //ms
+
