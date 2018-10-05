@@ -40,7 +40,6 @@ function onHover(svg, grid){
     svg.on('touchmove mousemove', function() {
         [px, py] = d3.mouse(this);
         [i, j] = pixelToGrid(px, py)
-        console.log(i,j)
         document.getElementById("hoverPenalty").innerHTML = "Penalty: " + 
             Number(grid[i][j].toFixed(2));
     });

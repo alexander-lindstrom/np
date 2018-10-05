@@ -18,7 +18,7 @@ export const leftPen = 0.2
 export const scale =  50
 
 //Simulation
-export const steps = 40
+export const steps = 50
 export const startSquares = [[6, 0], [13, 0]]
-export const delay = 500 //ms
+export const delay = 300 //ms
 
