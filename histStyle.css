@@ -1,0 +1,27 @@
+
+body {
+  font: 10px sans-serif;
+}
+
+.bar rect {
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #999999;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.histHeader{
+  text-align: center;
+}
+
+
+#sliders { width: 50%; margin: 25px auto; text-align: center;}
+#sliders li { margin: 20px; }
+.slider { margin: 20px 0; }

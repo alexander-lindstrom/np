@@ -1,0 +1,48 @@
+<html>
+    <head>
+    <title>Simple model</title>
+    </head>
+    <body>
+    
+        <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+         rel = "stylesheet">
+        <link rel="stylesheet" type="text/css" href="histStyle.css">
+        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+        <script src="https://d3js.org/d3.v3.min.js"></script>
+        <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+        <script type="module" src="measure.js"></script>
+       
+        <ul id="sliders">
+            <li id="trials">
+                <span class="label">Trials:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+            <li id="width">
+                <span class="label">Width:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+            <li id="crowdPen">
+                <span class="label">Crowding penalty:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+            <li id="dirPen">
+                <span class="label">Direction penalty:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+        </ul>
+        </ul>
+        
+        <div class = "buttons">
+            <input id = "runButton" type = "submit" value = "Go!">
+        </div>
+        
+        <div class = "histHeader">
+            <h1>Histogram of axon lengths (2 axons per trial)</h1>
+        </div>
+    </body>
+</html>

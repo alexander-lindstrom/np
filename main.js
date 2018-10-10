@@ -2,28 +2,58 @@ import * as config from './config.js'
 import * as draw from './draw.js'
 import * as sim from './simulate.js'
 
-run()
+var walks = [];
 
-function run(){
+export function animate(){
 
-    var grid = initGrid();
+    
     var svg = d3.select('body')
         .append('svg')
         .attrs({width: config.width * config.scale, 
             height: config.height * config.scale});
-    draw.drawGrid(svg, grid);
+    var grid = initGrid(config.height, config.width);
+    draw.drawGrid(svg, grid, config.height, config.width);
     onHover(svg, grid);
-    sim.simulate(svg, grid);
+    sim.simulate(svg, grid, true);
+
 }
 
-function initGrid(){
+export function walkLength(trials, width, crowdPen, dirPen){
     
-    var grid = new Array(config.height);
+    walks = [];
+    console.log(trials, width, crowdPen, dirPen);
     
-    for(var i = 0; i < config.height; i++){
-        grid[i] = new Array(config.width);
+    //var checkpoints = [Math.floor(0.4*trials), Math.floor(0.6*trials), 
+    //    Math.floor(0.8*trials), trials];
+    //var svg;
+    
+    for(var i = 0; i <= trials; i++){
+        var grid = initGrid(config.height, width);
+        sim.simulate(false, grid, false, width, crowdPen, dirPen);
         
-        for(var j = 0; j < config.width; j++){
+    }
+    draw.histogram(walks);
+    var mean = d3.mean(walks);
+    var stdDev = d3.deviation(walks);
+    console.log(mean, stdDev);
+}
+
+export function simulateCallback(lens){
+
+    for(var i = 0; i < lens.length; i++){
+        walks.push(lens[i]);
+    }
+}
+
+
+function initGrid(height, width){
+    
+    var grid = new Array(height);
+    
+    for(var i = 0; i < height; i++){
+        grid[i] = new Array(width);
+        
+        for(var j = 0; j < width; j++){
             grid[i][j] = Math.random() * 
                 (config.maxGridPen - config.minGridPen) + 
                 config.minGridPen
