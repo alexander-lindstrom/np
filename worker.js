@@ -1,13 +1,59 @@
-import * as config from './config.js'
-import * as draw from './draw.js'
-import * as main from './main.js'
+//Very ugly workaround
 
-//animate = true for animation
-export async function simulate(svg, grid, animate, width=config.width,
-    height=config.height, axons=config.axons, crowdPen=config.crowdPen, 
-    dirPen=config.dirPen, scale=config.scale, steps = config.steps){
+var walks = [];
+
+
+
+
+self.onmessage = function (msg) {
+   
+    var data = msg.data;
+    var trials = data[0];
+    var width = data[1];
+    var height = data[2];
+    var axons = data[3];
+    var steps =  data[4];
+    var crowdPen = data[5];
+    var dirPen = data[6];
     
+    console.log(trials, width, height, axons, steps, crowdPen, dirPen)
     
+    for(var i = 0; i <= trials; i++){
+
+        var grid = initGrid(height, width);
+        simulate(grid, width, height, axons, crowdPen, dirPen, steps);
+        
+    }
+    postMessage(walks);
+    close();
+}
+
+//Duplicate of initGrid in main.js. Careful! Hardcoded values here.
+function initGrid(height, width){
+    
+    var maxGridPen = 0.5;
+    var minGridPen = 0;
+    var grid = new Array(height);
+    
+    for(var i = 0; i < height; i++){
+        grid[i] = new Array(width);
+        
+        for(var j = 0; j < width; j++){
+            grid[i][j] = Math.random() * 
+                (maxGridPen - minGridPen) + 
+                minGridPen
+        }
+    }
+    return grid
+}
+
+
+//Below is a re-write of the content in simulate.js. Everything related to animation
+//has been removed. This means any changes has to be made in both
+//places...
+async function simulate(grid, width, height, axons, crowdPen, dirPen, 
+    steps){
+
     var startGrid = grid.slice(); //Keep a copy of the initial grid 
     var positions = new Array(steps + 1);
     var follows = new Array(axons); //[followingId, timeStep, IdStep]
@@ -35,9 +81,6 @@ export async function simulate(svg, grid, animate, width=config.width,
     /* Main loop */
     for(var i = 0; i < steps; i++){
     
-        if (animate){
-            await sleep(config.delay);
-        }
         
         for(var j = 0; j < axons; j++){
             
@@ -57,13 +100,6 @@ export async function simulate(svg, grid, animate, width=config.width,
             updatePenalty(grid, startGrid, visitedGrid, next[0], next[1], crowdPen);
             collision(positions, visitedGrid, follows, next, j, i);
             
-            //Animate if enabled
-            if (animate){
-                
-                
-                draw.drawLine(svg, curr[1], curr[0], next[1], next[0], scale);
-                updateSquareColor(grid, next[0], next[1], width);
-            }
             
             //Check if target has been reached for walker j
             if(targetReached(next, width)){
@@ -76,10 +112,7 @@ export async function simulate(svg, grid, animate, width=config.width,
         }
     }
     
-    if(!animate){
-        getWalkLengths(positions, axons)
-    }
-    
+    getWalkLengths(positions, axons)
 }
 
 //Stop if there are no more active axons
@@ -194,7 +227,9 @@ function getWalkLengths(positions, axons){
             }
         }
     }
-    main.simulateCallback(lens);
+    for(var i = 0; i < lens.length; i++){
+        walks.push(lens[i]);
+    }
 }
 
 function posEquals(pos1, pos2){
@@ -207,11 +242,7 @@ function targetReached(pos, width){
     return (pos[1] == (width-1))
 }
 
-function updateSquareColor(grid, i, j, width){
-    
-    var squareId = draw.indexToId(i, j, width);
-    draw.updateSquareFill(squareId, grid[i][j]);
-}
+
 
 function updatePenalty(grid, startGrid, visitedGrid, i, j, crowdPen){
    
@@ -282,10 +313,6 @@ function getNeighboors(grid, pos, height, width, dirPen){
         penalties.push(grid[i][j-1] + dirPen*2)
     }
     return [coords, penalties]
-}
-
-export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function onGrid(i, j, height, width){

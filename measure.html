@@ -14,13 +14,29 @@
         <script type="module" src="measure.js"></script>
        
         <ul id="sliders">
-            <li id="trials">
-                <span class="label">Trials:</span>
+            
+            <li id="width">
+                <span class="label">Width:</span>
                 <span class="range"></span>
                 <div class="slider"></div>
             </li>
-            <li id="width">
-                <span class="label">Width:</span>
+            <li id="height">
+                <span class="label">Height:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+            <li id="axons">
+                <span class="label">Number of axons:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+            <li id="steps">
+                <span class="label">Simulation steps:</span>
+                <span class="range"></span>
+                <div class="slider"></div>
+            </li>
+            <li id="trials">
+                <span class="label">Trials:</span>
                 <span class="range"></span>
                 <div class="slider"></div>
             </li>
@@ -35,14 +51,14 @@
                 <div class="slider"></div>
             </li>
         </ul>
-        </ul>
         
         <div class = "buttons">
             <input id = "runButton" type = "submit" value = "Go!">
         </div>
         
         <div class = "histHeader">
-            <h1>Histogram of axon lengths (2 axons per trial)</h1>
+            <h1>Animation</h1>
+            <p id="hoverPenalty">Penalty: </p>
         </div>
     </body>
 </html>

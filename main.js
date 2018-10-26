@@ -4,40 +4,48 @@ import * as sim from './simulate.js'
 
 var walks = [];
 
-export function animate(){
-
+export function animate(width, height, axons, steps, crowdPen, dirPen){
     
+ 
+    var scale = getScale(width, height);
     var svg = d3.select('body')
         .append('svg')
-        .attrs({width: config.width * config.scale, 
-            height: config.height * config.scale});
-    var grid = initGrid(config.height, config.width);
-    draw.drawGrid(svg, grid, config.height, config.width);
+        .attrs({width: width * scale, 
+            height: height * scale, id: "gridSvg"});
+    var grid = initGrid(height, width);
+
+    draw.drawGrid(svg, grid, height, width, scale);
     onHover(svg, grid);
-    sim.simulate(svg, grid, true);
+    sim.simulate(svg, grid, true, width, height, axons, crowdPen, dirPen, scale, steps);
 
 }
 
-export function walkLength(trials, width, crowdPen, dirPen){
+function getScale(width, height){
     
+    if (width > height){
+        return 0.75*(screen.width/width);
+    }
+    return 0.75*(screen.height/height);
+}
+
+//Currently unused
+export function walkLength(trials, width, height, axons, steps,
+    crowdPen, dirPen){
+    
+    var scale = getScale(width, height);
     walks = [];
-    console.log(trials, width, crowdPen, dirPen);
-    
-    //var checkpoints = [Math.floor(0.4*trials), Math.floor(0.6*trials), 
-    //    Math.floor(0.8*trials), trials];
-    //var svg;
     
     for(var i = 0; i <= trials; i++){
-        var grid = initGrid(config.height, width);
-        sim.simulate(false, grid, false, width, crowdPen, dirPen);
+        var grid = initGrid(height, width);
+        sim.simulate(false, grid, false, width, height, axons, crowdPen, dirPen, scale, steps);
         
     }
     draw.histogram(walks);
     var mean = d3.mean(walks);
     var stdDev = d3.deviation(walks);
-    console.log(mean, stdDev);
 }
 
+//Curently unused
 export function simulateCallback(lens){
 
     for(var i = 0; i < lens.length; i++){
@@ -69,6 +77,7 @@ function onHover(svg, grid){
     
     svg.on('touchmove mousemove', function() {
         [px, py] = d3.mouse(this);
+        console.log(px, py)
         [i, j] = pixelToGrid(px, py)
         document.getElementById("hoverPenalty").innerHTML = "Penalty: " + 
             Number(grid[i][j].toFixed(2));

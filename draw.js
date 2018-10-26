@@ -1,8 +1,8 @@
 import * as config from './config.js'
 
-export function drawGrid(svg, grid, height, width){
+export function drawGrid(svg, grid, height, width, scale){
     
-    fillGrid(svg, grid, height, width, config.scale) 
+    fillGrid(svg, grid, height, width, scale) 
 }
 
 function fillGrid(svg, grid, height, width, scale){
@@ -10,7 +10,7 @@ function fillGrid(svg, grid, height, width, scale){
     for(var i = 0; i < height; i++){
         for(var j = 0; j < width; j++){
         
-            fillSquare(svg, j, i, scale, grid[i][j])
+            fillSquare(svg, j, i, scale, grid[i][j], width)
         }
     }
 }
@@ -21,17 +21,17 @@ export function getColor(penalty){
     return d3.rgb(intensity, intensity, intensity);
 }
 
-function fillSquare(svg, x, y, scale, penalty){
+function fillSquare(svg, x, y, scale, penalty, width){
     
-    var squareId = indexToId(y, x);
+    var squareId = indexToId(y, x, width);
     var color = getColor(penalty);
     svg.append('rect')
         .attrs({x: x*scale, y: y*scale, width: scale, height: scale, fill: color,
             class: "square", id: squareId})
 }
 
-export function indexToId(i, j){
-    return i*config.width + j;
+export function indexToId(i, j, width){
+    return i*width + j;
 }
 
 export function updateSquareFill(squareId, penalty){
@@ -41,9 +41,8 @@ export function updateSquareFill(squareId, penalty){
     square.style.fill = color;
 }
 
-export function drawLine(svg, fromX, fromY, toX, toY){
+export function drawLine(svg, fromX, fromY, toX, toY, scale){
 
-    var scale = config.scale;
     fromX = fromX*scale + scale/2;
     fromY = fromY*scale + scale/2;
     toX =  toX*scale + scale/2;
@@ -56,6 +55,8 @@ export function drawLine(svg, fromX, fromY, toX, toY){
 }
 
 export function histogram(values){
+
+    console.log(values)
     
     var color = "steelblue";
     var formatCount = d3.format(",.0f");
