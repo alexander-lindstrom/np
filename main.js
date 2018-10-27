@@ -4,28 +4,31 @@ import * as sim from './simulate.js'
 
 var walks = [];
 
-export function animate(width, height, axons, steps, crowdPen, dirPen){
+export function animate(width, height, axons, axonShare, steps, crowdPen, dirPen){
     
- 
-    var scale = getScale(width, height);
+    var scaleI, scaleJ;
+    scaleI = scaleJ = getScale(width, height);
     var svg = d3.select('body')
         .append('svg')
-        .attrs({width: width * scale, 
-            height: height * scale, id: "gridSvg"});
+        .attrs({width: width * scaleJ, 
+            height: height * scaleI, id: "gridSvg"});
     var grid = initGrid(height, width);
 
-    draw.drawGrid(svg, grid, height, width, scale);
+    draw.drawGrid(svg, grid, height, width, scaleI, scaleJ);
     onHover(svg, grid);
-    sim.simulate(svg, grid, true, width, height, axons, crowdPen, dirPen, scale, steps);
+    sim.simulate(svg, grid, true, width, height, axons, axonShare, crowdPen, 
+        dirPen, scaleI, scaleJ, steps);
 
+}
+
+export function animateCallback(svg, grid){
+    console.log("animateCallback")
+    onHover(svg, grid);
 }
 
 function getScale(width, height){
     
-    if (width > height){
-        return 0.75*(screen.width/width);
-    }
-    return 0.75*(screen.height/height);
+        return 0.5*(screen.width/width);
 }
 
 //Currently unused

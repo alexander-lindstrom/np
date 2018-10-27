@@ -10,10 +10,9 @@ function setRunButton(){
     $("#runButton").button().click(function(){
         
         //Remove any old svgs
-        removeElement("histSvg");
+        removeElement("histWalks");
+        removeElement("histClusters");
         removeElement("gridSvg");
-        
-
         
         var trials = $("#trials .slider").slider("value");
         var width = $("#width .slider").slider("value");
@@ -21,15 +20,19 @@ function setRunButton(){
         var dirPen = $("#dirPen .slider").slider("value")/100;
         var height = $("#height .slider").slider("value");
         var axons = $("#axons .slider").slider("value");
+        var axonShare = $("#axonType .slider").slider("value")/100;
         var steps = $("#steps .slider").slider("value");
         
-        main.animate(width, height, axons, steps, crowdPen, dirPen);
-        startWorker(trials, width, height, axons, steps, crowdPen, dirPen);
+        main.animate(width, height, axons, axonShare, steps, crowdPen, dirPen);
+        console.log(axonShare)
+        startWorker(trials, width, height, axons, axonShare, steps, crowdPen, dirPen);
         
     }); 
+    $("#runButton").css({ width: '100px', 'padding-top': '10px', 'padding-bottom': '10px' });
+    
 }
 
-function startWorker(trials, width, height, axons, steps, crowdPen, dirPen){
+function startWorker(trials, width, height, axons, axonShare, steps, crowdPen, dirPen){
 
     if(typeof(Worker) == "undefined") {
         console.log("Web workers not supported :(")
@@ -38,15 +41,22 @@ function startWorker(trials, width, height, axons, steps, crowdPen, dirPen){
     
 
     var w = new Worker("worker.js");
-    w.postMessage([trials, width, height, axons, steps, crowdPen, dirPen]);
+    w.postMessage([trials, width, height, axons, axonShare, steps, crowdPen, dirPen]);
 
     w.onmessage = function(e) {
-        var walks = e.data;
-        draw.histogram(walks);
+        
+        var walks = e.data[0];
+        var clusters = e.data[1];
+        
+        
+        draw.histogram(walks, "histWalks");
         var mean = d3.mean(walks);
         var stdDev = d3.deviation(walks);
+        
+        draw.histogram(clusters, "histClusters");
+        var mean = d3.mean(clusters);
+        var stdDev = d3.deviation(clusters);
     }
-    
 }
 
 function removeElement(elementId){
@@ -60,12 +70,13 @@ function setSliders(){
     
     
     $("#trials .label").text("Trials: " + config.trials);
-    $("#steps .label").text("Steps: " + config.steps);
+    $("#steps .label").text("Max iterations: " + config.steps);
     $("#axons .label").text("Axons: " + config.axons);
+    $("#axonType .label").text("Axon type split: " + config.axonShare);
     $("#width .label").text("Width: " + config.width);
     $("#height .label").text("Height: " + config.height);
     $("#crowdPen .label").text("Crowding penalty: " + config.crowdPen);
-    $("#dirPen .label").text("Direction penalty: " + config.dirPen);
+    $("#dirPen .label").text("Forward incentive: " + config.dirPen);
     
     
     $( "#height .slider" ).slider({
@@ -93,7 +104,7 @@ function setSliders(){
     $( "#axons .slider" ).slider({
         range: false,
         orientation: "horizontal",
-        min: 1,
+        min: 5,
         max: 100,
         value: config.axons,
         slide: function( event, ui ) {
@@ -101,14 +112,25 @@ function setSliders(){
         }
     });
     
+    $( "#axonType .slider" ).slider({
+        range: false,
+        orientation: "horizontal",
+        min: 0,
+        max: 100,
+        value: config.axonShare*100,
+        slide: function( event, ui ) {
+            $("#axonType .label").text("Axon type split: " + ui.value/100);
+        }
+    });
+    
     $( "#steps .slider" ).slider({
         range: false,
         orientation: "horizontal",
-        min: 100,
-        max: 10000,
+        min: 50,
+        max: 1000,
         value: config.steps,
         slide: function( event, ui ) {
-            $("#steps .label").text("Steps: " + ui.value);
+            $("#steps .label").text("Max iterations: " + ui.value);
         }
     });
     

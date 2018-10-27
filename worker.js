@@ -1,6 +1,7 @@
 //Very ugly workaround
 
 var walks = [];
+var clusters = [];
 
 
 
@@ -12,19 +13,18 @@ self.onmessage = function (msg) {
     var width = data[1];
     var height = data[2];
     var axons = data[3];
-    var steps =  data[4];
-    var crowdPen = data[5];
-    var dirPen = data[6];
-    
-    console.log(trials, width, height, axons, steps, crowdPen, dirPen)
+    var axonShare = data[4]
+    var steps =  data[5];
+    var crowdPen = data[6];
+    var dirPen = data[7];
     
     for(var i = 0; i <= trials; i++){
 
         var grid = initGrid(height, width);
-        simulate(grid, width, height, axons, crowdPen, dirPen, steps);
+        simulate(grid, width, height, axons, axonShare, crowdPen, dirPen, steps);
         
     }
-    postMessage(walks);
+    postMessage([walks, clusters]);
     close();
 }
 
@@ -51,14 +51,16 @@ function initGrid(height, width){
 //Below is a re-write of the content in simulate.js. Everything related to animation
 //has been removed. This means any changes has to be made in both
 //places...
-async function simulate(grid, width, height, axons, crowdPen, dirPen, 
+async function simulate(grid, width, height, axons, axonShare, crowdPen, dirPen, 
     steps){
 
+    
     var startGrid = grid.slice(); //Keep a copy of the initial grid 
     var positions = new Array(steps + 1);
     var follows = new Array(axons); //[followingId, timeStep, IdStep]
     var visitedGrid = createVisitedGrid(height, width); //Keep track of which axons have visit
                                                         //which square.
+    var axonTypes = setAxonTypes(axons, axonShare);                                                   
     var last = new Array(axons);
     var reached = new Array(axons);
     
@@ -98,7 +100,7 @@ async function simulate(grid, width, height, axons, crowdPen, dirPen,
             updateVisitedGrid(visitedGrid, next, j);
             moveTo(positions, next, i, j);
             updatePenalty(grid, startGrid, visitedGrid, next[0], next[1], crowdPen);
-            collision(positions, visitedGrid, follows, next, j, i);
+            collision(positions, visitedGrid, follows, axonTypes, next, j, i);
             
             
             //Check if target has been reached for walker j
@@ -112,8 +114,20 @@ async function simulate(grid, width, height, axons, crowdPen, dirPen,
         }
     }
     
-    getWalkLengths(positions, axons)
+    measure(positions, follows, axons)
 }
+
+function setAxonTypes(axons, axonShare){
+    
+    var axonTypes = new Array(axons);
+    //True - red, false - blue
+    for(var i = 0; i < axons; i++){
+            axonTypes[i] = (Math.random() < axonShare);
+    }
+    
+    return axonTypes;
+}
+
 
 //Stop if there are no more active axons
 function checkForStop(reached){
@@ -126,8 +140,7 @@ function checkForStop(reached){
     return true; 
 }
 
-//Check and handle a potential collision
-function collision(positions, visitedGrid, follows, pos, selfId, iteration){
+function collision(positions, visitedGrid, follows, axonTypes, pos, selfId, iteration){
     
     //If axon is already following, no need to do anything
     if(follows[selfId]){
@@ -138,14 +151,22 @@ function collision(positions, visitedGrid, follows, pos, selfId, iteration){
     var numVisit = visitedGrid[pos[0]][pos[1]].length;
     if (numVisit > 0){
         
-        //Only assign to follows if it was another axon
+        
         for(var i = 0; i < numVisit; i++){
+        
+            
             var candidate = visitedGrid[pos[0]][pos[1]][i];
+            
+            //Different types should not follow eachother
+            if(axonTypes[candidate] != axonTypes[selfId]){
+                continue;
+            }
+            
+            //Only assign to follows if it was another axon
             if(candidate != selfId){
             
-                //Avoid having two axons follows eachother
-                var candData = follows[candidate];
-                if(candData && candData[0][0] == selfId){
+                //Avoid creating a loop
+                if (isLoop(follows, selfId, candidate)){
                     continue;
                 }
                 
@@ -156,6 +177,24 @@ function collision(positions, visitedGrid, follows, pos, selfId, iteration){
                
             }
         }
+    }
+}
+
+function isLoop(follows, selfId, candId){
+    
+    var currId = candId;
+
+    while(1){
+        
+        var data = follows[currId];
+        //leading axon has been found
+        if (typeof data == "undefined"){
+            if (currId != selfId){
+                return false;
+            }
+            return true;
+        }
+        currId = data[0][0];
     }
 }
 
@@ -215,9 +254,46 @@ function linspace(a, b, n) {
     return arr;
 }
 
-//Return walk lengths [axon1_length, axon2_length, ...]
-function getWalkLengths(positions, axons){
+function measure(positions, follows, axons){
     
+    getWalkLengths(positions, axons);
+    getBundleSizes(follows, axons);
+    
+}
+
+function getBundleSizes(follows, axons){
+   
+    var leaders = [];
+    for(var i = 0; i < axons; i++){
+        if (typeof follows[i] == "undefined"){
+            leaders.push(i)
+        }
+    }
+    
+    var clusterSizes = new Array(leaders.length);
+    for(var i = 0; i < leaders.length; i++){
+        var id = leaders[i];
+        var count = 0;
+        for(var j = 0; j < axons; j++){
+            if(j == id){
+                count++;
+            }
+            else{   
+                //Reversal of argument since we are doing it in the opposite way.
+                if (isLoop(follows, id, j)){
+                    count++;
+                }
+            }
+        }
+        clusterSizes[i] = count;
+    }
+    for(var i = 0; i < clusterSizes.length; i++){
+        clusters.push(clusterSizes[i]);
+    }
+}
+
+
+function getWalkLengths(positions, axons){
     
     var lens = new Array(axons).fill(0);
     for(var i = 0; i < positions.length; i++){

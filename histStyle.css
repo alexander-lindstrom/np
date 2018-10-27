@@ -1,10 +1,9 @@
 
 body {
-  font: 10px sans-serif;
+  font: 20px sans-serif;
 }
 
 .line{
-  stroke: #FF0000;
   stroke-width: 3px;
 }
 
@@ -39,7 +38,42 @@ body {
   text-align: center;
 }
 
+.label{
+    
+    font-size: 100%;
+}
 
-#sliders { width: 50%; margin: 25px auto; text-align: center;}
+#run{
+    position: absolute;
+    left: 70%;
+    top: 70%;
+}
+
+#gridSvg{
+    position: absolute;
+    left: 1%;
+    top: 1%; 
+}
+
+
+
+#histWalks{
+    position: relative;
+    left: 55%;
+}
+
+#histClusters{
+    position: relative;
+    left: 55%;
+}
+
+#sliders { 
+    width: 40%; 
+    margin: 25px auto;
+    text-align: center;
+    position: relative;
+    left: 25%
+}
+
 #sliders li { margin: 20px; }
 .slider { margin: 20px 0; }

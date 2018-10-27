@@ -3,16 +3,15 @@ import * as draw from './draw.js'
 import * as main from './main.js'
 
 //animate = true for animation
-export async function simulate(svg, grid, animate, width=config.width,
-    height=config.height, axons=config.axons, crowdPen=config.crowdPen, 
-    dirPen=config.dirPen, scale=config.scale, steps = config.steps){
-    
-    
+export async function simulate(svg, grid, animate, width, height, axons, axonShare,
+    crowdPen, dirPen, scaleI, scaleJ, steps){
+  
     var startGrid = grid.slice(); //Keep a copy of the initial grid 
     var positions = new Array(steps + 1);
     var follows = new Array(axons); //[followingId, timeStep, IdStep]
     var visitedGrid = createVisitedGrid(height, width); //Keep track of which axons have visit
                                                         //which square.
+    var axonTypes = setAxonTypes(axons, axonShare);
     var last = new Array(axons);
     var reached = new Array(axons);
     
@@ -55,13 +54,12 @@ export async function simulate(svg, grid, animate, width=config.width,
             updateVisitedGrid(visitedGrid, next, j);
             moveTo(positions, next, i, j);
             updatePenalty(grid, startGrid, visitedGrid, next[0], next[1], crowdPen);
-            collision(positions, visitedGrid, follows, next, j, i);
+            collision(positions, visitedGrid, follows, axonTypes, next, j, i);
             
             //Animate if enabled
             if (animate){
-                
-                
-                draw.drawLine(svg, curr[1], curr[0], next[1], next[0], scale);
+                draw.drawLine(svg, curr[1], curr[0], next[1], next[0], scaleI, 
+                    scaleJ, axonTypes[j]);
                 updateSquareColor(grid, next[0], next[1], width);
             }
             
@@ -79,7 +77,20 @@ export async function simulate(svg, grid, animate, width=config.width,
     if(!animate){
         getWalkLengths(positions, axons)
     }
+    if(animate){
+        main.animateCallback(svg, grid);
+    }
+}
+
+function setAxonTypes(axons, axonShare){
     
+    var axonTypes = new Array(axons);
+    //True - red, false - blue
+    for(var i = 0; i < axons; i++){
+            axonTypes[i] = (Math.random() < axonShare);
+    }
+    
+    return axonTypes;
 }
 
 //Stop if there are no more active axons
@@ -93,8 +104,8 @@ function checkForStop(reached){
     return true; 
 }
 
-//Check and handle a potential collision
-function collision(positions, visitedGrid, follows, pos, selfId, iteration){
+
+function collision(positions, visitedGrid, follows, axonTypes, pos, selfId, iteration){
     
     //If axon is already following, no need to do anything
     if(follows[selfId]){
@@ -105,14 +116,22 @@ function collision(positions, visitedGrid, follows, pos, selfId, iteration){
     var numVisit = visitedGrid[pos[0]][pos[1]].length;
     if (numVisit > 0){
         
-        //Only assign to follows if it was another axon
+        
         for(var i = 0; i < numVisit; i++){
+        
+            
             var candidate = visitedGrid[pos[0]][pos[1]][i];
+            
+            //Different types should not follow eachother
+            if(axonTypes[candidate] != axonTypes[selfId]){
+                continue;
+            }
+            
+            //Only assign to follows if it was another axon
             if(candidate != selfId){
             
-                //Avoid having two axons follows eachother
-                var candData = follows[candidate];
-                if(candData && candData[0][0] == selfId){
+                //Avoid creating a loop
+                if (isLoop(follows, selfId, candidate)){
                     continue;
                 }
                 
@@ -123,6 +142,24 @@ function collision(positions, visitedGrid, follows, pos, selfId, iteration){
                
             }
         }
+    }
+}
+
+function isLoop(follows, selfId, candId){
+    
+    var currId = candId;
+
+    while(1){
+        
+        var data = follows[currId];
+        //leading axon has been found
+        if (typeof data == "undefined"){
+            if (currId != selfId){
+                return false;
+            }
+            return true;
+        }
+        currId = data[0][0];
     }
 }
 

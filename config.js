@@ -15,10 +15,11 @@ export const dirPen = 0.1
 export const scale =  50
 
 //Simulation
-export const steps = 1000
+export const steps = 500
 export const delay = 300 //ms
 export const trials = 1000
 export const axons = 10
 export const frequency = 100
+export const axonShare = 0.5
 
 

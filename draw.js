@@ -1,16 +1,16 @@
 import * as config from './config.js'
 
-export function drawGrid(svg, grid, height, width, scale){
+export function drawGrid(svg, grid, height, width, scaleI, scaleJ){
     
-    fillGrid(svg, grid, height, width, scale) 
+    fillGrid(svg, grid, height, width, scaleI, scaleJ) 
 }
 
-function fillGrid(svg, grid, height, width, scale){
+function fillGrid(svg, grid, height, width, scaleI, scaleJ){
 
     for(var i = 0; i < height; i++){
         for(var j = 0; j < width; j++){
         
-            fillSquare(svg, j, i, scale, grid[i][j], width)
+            fillSquare(svg, j, i, scaleI, scaleJ, grid[i][j], width)
         }
     }
 }
@@ -21,12 +21,12 @@ export function getColor(penalty){
     return d3.rgb(intensity, intensity, intensity);
 }
 
-function fillSquare(svg, x, y, scale, penalty, width){
+function fillSquare(svg, x, y, scaleI, scaleJ, penalty, width){
     
     var squareId = indexToId(y, x, width);
     var color = getColor(penalty);
     svg.append('rect')
-        .attrs({x: x*scale, y: y*scale, width: scale, height: scale, fill: color,
+        .attrs({x: x*scaleJ, y: y*scaleI, width: scaleJ, height: scaleI, fill: color,
             class: "square", id: squareId})
 }
 
@@ -41,20 +41,25 @@ export function updateSquareFill(squareId, penalty){
     square.style.fill = color;
 }
 
-export function drawLine(svg, fromX, fromY, toX, toY, scale){
+export function drawLine(svg, fromX, fromY, toX, toY, scaleI, scaleJ, type){
 
-    fromX = fromX*scale + scale/2;
-    fromY = fromY*scale + scale/2;
-    toX =  toX*scale + scale/2;
-    toY = toY*scale + scale/2;
+    fromX = fromX*scaleJ + scaleJ/2;
+    fromY = fromY*scaleI + scaleI/2;
+    toX =  toX*scaleJ + scaleJ/2;
+    toY = toY*scaleI + scaleI/2;
     
-       
+    if (type){
+        var color = "red"
+    }  
+    else{
+        var color = "blue"
+    }
     svg.append('line')
         .attrs({x1: fromX, y1: fromY, x2: toX,
-            y2: toY, class: "line"})
+            y2: toY, class: "line", stroke: color})
 }
 
-export function histogram(values){
+export function histogram(values, id){
 
     console.log(values)
     
@@ -62,8 +67,8 @@ export function histogram(values){
     var formatCount = d3.format(",.0f");
 
     var margin = {top: 20, right: 30, bottom: 30, left: 30},
-        width = 1152 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+        width = screen.width*0.45 - margin.left - margin.right,
+        height = screen.height*0.3 - margin.top - margin.bottom;
         
     var max = d3.max(values);
     var min = d3.min(values);
@@ -93,7 +98,7 @@ export function histogram(values){
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .attr("id", "histSvg")
+        .attr("id", id)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
