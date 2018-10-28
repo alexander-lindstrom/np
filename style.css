@@ -1,0 +1,122 @@
+
+body {
+  font: 20px sans-serif;
+}
+
+
+.line{
+  stroke-width: 3px;
+}
+
+.square{
+    stroke: #000;
+}
+
+.penalty{
+    position: absolute;
+    top: 200px;
+    left: 1100px;
+    width: 200px;
+    height: 47px;
+    border: 3px solid #73AD21;
+}
+
+.bar rect {
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #999999;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+.label{
+    
+    font-size: 75%;
+}
+
+#run{
+    position: absolute;
+    left: 72.5%;
+    top: 50%;
+}
+
+#gridSvg{
+    position: absolute;
+    left: 1%;
+    top: 1%; 
+}
+
+#walks{
+    position: absolute;
+    top: 55%;
+    left: 55%;
+}
+
+#clusters{
+    position: absolute;
+    top: 55%;
+    left: 55%;
+}
+
+#sliders { 
+    width: 40%; 
+    margin: 20px auto;
+    text-align: center;
+    position: relative;
+    left: 25%
+}
+
+#sliders li { margin: 10px; }
+.slider { margin: 10px 0; }
+
+/* Style the tab */
+.tab {
+    visibility: hidden;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    position: absolute;
+    top: 50%;
+    left: 55%;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+}
+
+.dlink{
+    position: absolute;
+    top: 5%;
+    left: 90%;
+}
+

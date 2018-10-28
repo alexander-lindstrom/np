@@ -6,7 +6,7 @@
     
         <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
          rel = "stylesheet">
-        <link rel="stylesheet" type="text/css" href="histStyle.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
         <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
         <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -46,7 +46,7 @@
                 <div class="slider"></div>
             </li>
             <li id="crowdPen">
-                <span class="label">Crowding penalty:</span>
+                <span class="label">Proximity penalty:</span>
                 <span class="range"></span>
                 <div class="slider"></div>
             </li>
@@ -60,6 +60,65 @@
         <div id = "run">
             <input id = "runButton" type = "submit" value = "Go!">
         </div>
+        
+        <!-- Tab links -->
+        <div class="tab">
+            <button class="tablinks" onclick="switchTab(event, 'walks')">Axon lengths</button>
+            <button class="tablinks" onclick="switchTab(event, 'clusters')">Cluster sizes</button>
+        </div>
+
+        <!-- Tab content -->
+        <div id="walks" class="tabcontent" style="visibility: hidden">
+            <h3>Frequency of axon lengths</h3>
+            <button class="dlink" onclick="download(event, '#walksHist', 'walks.svg')">Download</button>
+            <p id="walksData">Mean: , SD: </p>
+        </div>
+
+        <div id="clusters" class="tabcontent" style="visibility: hidden">
+            <h3>Frequency of cluster sizes</h3>
+            <button class="dlink" onclick="download(event, '#clustersHist', 'clusters.svg')">Download</button>
+            <p id="clusterData">Mean: , SD: </p>
+        </div>
+    
+        
+        <script>
+        function switchTab(evt, selectedTab) {
+        
+            //Make all other tabs invisible
+            var tabs = ["walks", "clusters"];
+            for(var i = 0; i < tabs.length; i++){
+                var element = document.getElementById(tabs[i]);
+                element.style.visibility = 'hidden';
+            }
+            
+            var element = document.getElementById(selectedTab);
+            element.style.visibility = 'visible';
+
+}       </script>
+
+        <script>
+        function svgDataURL(svg) {
+
+            var svgAsXML = (new XMLSerializer).serializeToString(svg);
+            return "data:image/svg+xml," + encodeURIComponent(svgAsXML);
+        }
+
+        function download(evt, svgId, saveName) {
+    
+            console.log("hello")
+            var dataURL = svgDataURL($(svgId)[0]);
+
+
+            var dl = document.createElement("a");
+            document.body.appendChild(dl); // This line makes it work in Firefox.
+            dl.setAttribute("href", dataURL);
+            dl.setAttribute("download", saveName);
+            dl.click();
+        }
+        </script>
+
+        
+        
         
     </body>
 </html>

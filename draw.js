@@ -59,26 +59,36 @@ export function drawLine(svg, fromX, fromY, toX, toY, scaleI, scaleJ, type){
             y2: toY, class: "line", stroke: color})
 }
 
-export function histogram(values, id){
+function intOnly(data){
+    
+    var cleaned = [];
+    for(var i = 0; i < data.length; i++){
+        if (Number.isInteger(data[i])){
+            cleaned.push(data[i]);
+        }
+    }
+    return cleaned;
+}
 
-    console.log(values)
+export function histogram(values, divId, svgId){
+
     
     var color = "steelblue";
     var formatCount = d3.format(",.0f");
 
-    var margin = {top: 20, right: 30, bottom: 30, left: 30},
-        width = screen.width*0.45 - margin.left - margin.right,
-        height = screen.height*0.3 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 30, bottom: 30, left: 70},
+        width = screen.width*0.40 - margin.left - margin.right,
+        height = screen.height*0.30 - margin.top - margin.bottom;
         
     var max = d3.max(values);
     var min = d3.min(values);
     var x = d3.scale.linear()
           .domain([min, max])
           .range([0, width]);
-          
+    
     //Uniformly spaced bins
     var data = d3.layout.histogram()
-        .bins(x.ticks(50))
+        .bins(intOnly(x.ticks(60)))
         (values);
                
     var yMax = d3.max(data, function(d){return d.length});
@@ -94,11 +104,16 @@ export function histogram(values, id){
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
+        
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+        
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(divId).append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .attr("id", id)
+        .attr("id", svgId)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -113,72 +128,27 @@ export function histogram(values, id){
         .attr("width", (x(data[0].dx) - x(0)) - 1)
         .attr("height", function(d) { return height - y(d.y); })
         .attr("fill", function(d) { return colorScale(d.y) });
-
+    
+    /* Bin value above rectangle:
     bar.append("text")
         .attr("dy", ".75em")
         .attr("y", -12)
         .attr("x", (x(data[0].dx) - x(0)) / 2)
         .attr("text-anchor", "middle")
         .text(function(d) { return formatCount(d.y); });
+        
+   */
 
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-    return svg;
-}
-
-export function refreshHistogram(values, svg){
-
-    var color = "steelblue";
-    var formatCount = d3.format(",.0f");
-
-    var margin = {top: 20, right: 30, bottom: 30, left: 30},
-        width = 1152 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
         
-    var max = d3.max(values);
-    var min = d3.min(values);
-    
-    var x = d3.scale.linear()
-          .domain([min, max])
-          .range([0, width]);
-          
-    var y = d3.scale.linear()
-        .domain([0, yMax])
-        .range([height, 0]);
-          
-    var data = d3.layout.histogram()
-        .bins(x.ticks(30))
-        (values);
-
-  // Reset y domain using new data
-    var yMax = d3.max(data, function(d){return d.length});
-    var yMin = d3.min(data, function(d){return d.length});
-        y.domain([0, yMax]);
-    var colorScale = d3.scale.linear()
-        .domain([yMin, yMax])
-        .range([d3.rgb(color).brighter(), d3.rgb(color).darker()]);
-
-    var bar = svg.selectAll(".bar").data(data);
-
-    // Remove object with data
-    bar.exit().remove();
-
-    bar.transition()
-        .duration(1000)
-        .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-    bar.select("rect")
-        .transition()
-        .duration(1000)
-        .attr("height", function(d) { return height - y(d.y); })
-        .attr("fill", function(d) { return colorScale(d.y) });
-
-    bar.select("text")
-        .transition()
-        .duration(1000)
-        .text(function(d) { return formatCount(d.y); });
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+        
+    return svg;
 }
 
 

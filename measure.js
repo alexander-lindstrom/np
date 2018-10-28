@@ -6,14 +6,13 @@ setSliders()
 setRunButton()
 
 function setRunButton(){
-
+    
+    
+    
     $("#runButton").button().click(function(){
+    
         
-        //Remove any old svgs
-        removeElement("histWalks");
-        removeElement("histClusters");
-        removeElement("gridSvg");
-        
+        //Get slider values
         var trials = $("#trials .slider").slider("value");
         var width = $("#width .slider").slider("value");
         var crowdPen = $("#crowdPen .slider").slider("value")/100;
@@ -22,9 +21,24 @@ function setRunButton(){
         var axons = $("#axons .slider").slider("value");
         var axonShare = $("#axonType .slider").slider("value")/100;
         var steps = $("#steps .slider").slider("value");
+       
+        //Kill any web worker
+        if (typeof(w) !== "undefined") {
+            w.terminate();
+        }
+        
+        //Remove svgs
+        removeElement("gridSvg");
+        removeElement("walksHist");
+        removeElement("clustersHist");
+        
+        //Make tab stuff visible
+        var tab = document.getElementsByClassName("tab");
+        tab[0].style.visibility='visible';
+        document.getElementById("walks").style.visibility = 'visible';
+        document.getElementById("clusters").style.visibility = 'hidden';
         
         main.animate(width, height, axons, axonShare, steps, crowdPen, dirPen);
-        console.log(axonShare)
         startWorker(trials, width, height, axons, axonShare, steps, crowdPen, dirPen);
         
     }); 
@@ -49,13 +63,17 @@ function startWorker(trials, width, height, axons, axonShare, steps, crowdPen, d
         var clusters = e.data[1];
         
         
-        draw.histogram(walks, "histWalks");
+        draw.histogram(walks, "#walks", "walksHist");
         var mean = d3.mean(walks);
         var stdDev = d3.deviation(walks);
+        var walksD = document.getElementById("walksData");
+        walksD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
         
-        draw.histogram(clusters, "histClusters");
+        draw.histogram(clusters, "#clusters", "clustersHist");
         var mean = d3.mean(clusters);
         var stdDev = d3.deviation(clusters);
+        var clusterD = document.getElementById("clusterData");
+        clusterD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
     }
 }
 
@@ -75,7 +93,7 @@ function setSliders(){
     $("#axonType .label").text("Axon type split: " + config.axonShare);
     $("#width .label").text("Width: " + config.width);
     $("#height .label").text("Height: " + config.height);
-    $("#crowdPen .label").text("Crowding penalty: " + config.crowdPen);
+    $("#crowdPen .label").text("Proximity penalty: " + config.crowdPen);
     $("#dirPen .label").text("Forward incentive: " + config.dirPen);
     
     

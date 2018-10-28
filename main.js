@@ -15,15 +15,13 @@ export function animate(width, height, axons, axonShare, steps, crowdPen, dirPen
     var grid = initGrid(height, width);
 
     draw.drawGrid(svg, grid, height, width, scaleI, scaleJ);
-    onHover(svg, grid);
     sim.simulate(svg, grid, true, width, height, axons, axonShare, crowdPen, 
         dirPen, scaleI, scaleJ, steps);
 
 }
 
 export function animateCallback(svg, grid){
-    console.log("animateCallback")
-    onHover(svg, grid);
+    console.log("Animation completed.")
 }
 
 function getScale(width, height){
@@ -73,19 +71,6 @@ function initGrid(height, width){
     return grid
 }
 
-function onHover(svg, grid){
-    
-    var i,j 
-    var px, py
-    
-    svg.on('touchmove mousemove', function() {
-        [px, py] = d3.mouse(this);
-        console.log(px, py)
-        [i, j] = pixelToGrid(px, py)
-        document.getElementById("hoverPenalty").innerHTML = "Penalty: " + 
-            Number(grid[i][j].toFixed(2));
-    });
-}
 
 function pixelToGrid(px, py){
     var i,j 
@@ -93,3 +78,4 @@ function pixelToGrid(px, py){
     i = Math.floor(py/config.scale);
     return [i, j]
 }
+
