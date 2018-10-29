@@ -4,7 +4,7 @@ import * as sim from './simulate.js'
 
 var walks = [];
 
-export function animate(width, height, axons, axonShare, steps, crowdPen, dirPen){
+export function animate(width, height, axons, axonShare, crowdPen, dirPen){
     
     var scaleI, scaleJ;
     scaleI = scaleJ = getScale(width, height);
@@ -16,7 +16,7 @@ export function animate(width, height, axons, axonShare, steps, crowdPen, dirPen
 
     draw.drawGrid(svg, grid, height, width, scaleI, scaleJ);
     sim.simulate(svg, grid, true, width, height, axons, axonShare, crowdPen, 
-        dirPen, scaleI, scaleJ, steps);
+        dirPen, scaleI, scaleJ, config.steps);
 
 }
 

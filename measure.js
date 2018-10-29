@@ -20,7 +20,6 @@ function setRunButton(){
         var height = $("#height .slider").slider("value");
         var axons = $("#axons .slider").slider("value");
         var axonShare = $("#axonType .slider").slider("value")/100;
-        var steps = $("#steps .slider").slider("value");
        
         //Kill any web worker
         if (typeof(w) !== "undefined") {
@@ -38,8 +37,8 @@ function setRunButton(){
         document.getElementById("walks").style.visibility = 'visible';
         document.getElementById("clusters").style.visibility = 'hidden';
         
-        main.animate(width, height, axons, axonShare, steps, crowdPen, dirPen);
-        startWorker(trials, width, height, axons, axonShare, steps, crowdPen, dirPen);
+        main.animate(width, height, axons, axonShare, crowdPen, dirPen);
+        startWorker(trials, width, height, axons, axonShare, config.steps, crowdPen, dirPen);
         
     }); 
     $("#runButton").css({ width: '100px', 'padding-top': '10px', 'padding-bottom': '10px' });
@@ -88,7 +87,6 @@ function setSliders(){
     
     
     $("#trials .label").text("Trials: " + config.trials);
-    $("#steps .label").text("Max iterations: " + config.steps);
     $("#axons .label").text("Axons: " + config.axons);
     $("#axonType .label").text("Axon type split: " + config.axonShare);
     $("#width .label").text("Width: " + config.width);
@@ -138,17 +136,6 @@ function setSliders(){
         value: config.axonShare*100,
         slide: function( event, ui ) {
             $("#axonType .label").text("Axon type split: " + ui.value/100);
-        }
-    });
-    
-    $( "#steps .slider" ).slider({
-        range: false,
-        orientation: "horizontal",
-        min: 50,
-        max: 1000,
-        value: config.steps,
-        slide: function( event, ui ) {
-            $("#steps .label").text("Max iterations: " + ui.value);
         }
     });
     

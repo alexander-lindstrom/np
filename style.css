@@ -12,14 +12,6 @@ body {
     stroke: #000;
 }
 
-.penalty{
-    position: absolute;
-    top: 200px;
-    left: 1100px;
-    width: 200px;
-    height: 47px;
-    border: 3px solid #73AD21;
-}
 
 .bar rect {
   shape-rendering: crispEdges;
@@ -44,7 +36,7 @@ body {
 #run{
     position: absolute;
     left: 72.5%;
-    top: 50%;
+    top: 48%;
 }
 
 #gridSvg{
@@ -55,26 +47,26 @@ body {
 
 #walks{
     position: absolute;
-    top: 55%;
+    top: 53%;
     left: 55%;
 }
 
 #clusters{
     position: absolute;
-    top: 55%;
+    top: 53%;
     left: 55%;
 }
 
 #sliders { 
     width: 40%; 
-    margin: 20px auto;
+    margin: 1% auto;
     text-align: center;
     position: relative;
     left: 25%
 }
 
-#sliders li { margin: 10px; }
-.slider { margin: 10px 0; }
+#sliders li { margin: 1%; }
+.slider { margin: 1% 0; }
 
 /* Style the tab */
 .tab {
@@ -83,7 +75,7 @@ body {
     border: 1px solid #ccc;
     background-color: #f1f1f1;
     position: absolute;
-    top: 50%;
+    top: 48%;
     left: 55%;
 }
 
