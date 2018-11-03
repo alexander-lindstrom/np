@@ -23,7 +23,7 @@ export function getColor(penalty){
 
 function fillSquare(svg, x, y, scaleI, scaleJ, penalty, width){
     
-    var squareId = indexToId(y, x, width);
+    var squareId = "s" + indexToId(y, x, width);
     var color = getColor(penalty);
     svg.append('rect')
         .attrs({x: x*scaleJ, y: y*scaleI, width: scaleJ, height: scaleI, fill: color,
@@ -34,12 +34,14 @@ export function indexToId(i, j, width){
     return i*width + j;
 }
 
-export function updateSquareFill(squareId, penalty){
+export function updateSquareFill(squareIndex, penalty){
     
     var color = getColor(penalty);
-    var square = document.getElementById(squareId);
-    square.style.fill = color;
+    var id = "#s" + squareIndex; 
+    d3.select(id).transition().duration(500).style("fill", color);
+       
 }
+
 
 export function drawLine(svg, fromX, fromY, toX, toY, scaleI, scaleJ, type){
 
@@ -54,10 +56,17 @@ export function drawLine(svg, fromX, fromY, toX, toY, scaleI, scaleJ, type){
     else{
         var color = "blue"
     }
+    
     svg.append('line')
-        .attrs({x1: fromX, y1: fromY, x2: toX,
-            y2: toY, class: "line", stroke: color})
-}
+        .attrs({x1: fromX, y1: fromY, x2: fromX,
+        y2: fromY, class: "line", stroke: color})
+        .transition()
+        .duration(500)
+        .attr({
+            x2: toX,
+            y2: toY
+        })
+    }
 
 function intOnly(data){
     

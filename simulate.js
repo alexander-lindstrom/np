@@ -33,7 +33,7 @@ export async function simulate(svg, grid, animate, width, height, axons, axonSha
     
     /* Main loop */
     for(var i = 0; i < steps; i++){
-    
+        
         if (animate){
             await sleep(config.delay);
         }
@@ -103,7 +103,6 @@ function checkForStop(reached){
     }
     return true; 
 }
-
 
 function collision(positions, visitedGrid, follows, axonTypes, pos, selfId, iteration){
     
