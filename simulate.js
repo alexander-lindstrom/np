@@ -26,10 +26,12 @@ export async function simulate(svg, grid, animate, width, height, axons, axonSha
         [a, b] = positions[0][k];
         updateVisitedGrid(visitedGrid, [a, b], k);
         updatePenalty(grid, startGrid, visitedGrid, a, b, crowdPen);
+        if(animate){
+            updateSquareColor(grid, a, b, width);
+        }
         reached[k] = false;
         last[k] = [-1, -1]
     }
- 
     
     /* Main loop */
     for(var i = 0; i < steps; i++){
