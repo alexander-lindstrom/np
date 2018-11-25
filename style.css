@@ -57,6 +57,13 @@ body {
     left: 55%;
 }
 
+#completed{
+    position: absolute;
+    top: 53%;
+    left: 55%;
+}
+
+
 #sliders { 
     width: 40%; 
     margin: 1% auto;

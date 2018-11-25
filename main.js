@@ -1,6 +1,7 @@
 import * as config from './config.js'
 import * as draw from './draw.js'
 import * as sim from './simulate.js'
+import * as measure from './measure.js'
 
 var walks = [];
 
@@ -21,6 +22,8 @@ export function animate(width, height, axons, axonShare, crowdPen, dirPen){
 }
 
 export function animateCallback(svg, grid){
+    
+    measure.toggleBusy();
     console.log("Animation completed.")
 }
 

@@ -53,6 +53,12 @@ export async function simulate(svg, grid, animate, width, height, axons, axonSha
             [coords, penalties] = getNeighboors(grid, curr, height, width, 
                 dirPen)
             next = chooseStep(positions, coords, penalties, last[j], follows, j, i);
+            //Terminate if there was no acceptable step
+            if(!next){
+                reached[j] = true;
+                continue;
+            }
+            
             updateVisitedGrid(visitedGrid, next, j);
             moveTo(positions, next, i, j);
             updatePenalty(grid, startGrid, visitedGrid, next[0], next[1], crowdPen);
@@ -287,6 +293,10 @@ function chooseStep(positions, coords, penalties, last, follows, selfId, iterati
             min = penalties[i];
             index = i;
         }
+    }
+    //Return false if there is no acceptable step
+    if(min >= 1){
+        return false
     }
     return coords[index]
 }

@@ -60,6 +60,8 @@
         <div class="tab">
             <button class="tablinks" onclick="switchTab(event, 'walks')">Axon lengths</button>
             <button class="tablinks" onclick="switchTab(event, 'clusters')">Cluster sizes</button>
+            <button class="tablinks" onclick="switchTab(event, 'completed')">Completed walks</button>
+            
         </div>
 
         <!-- Tab content -->
@@ -74,13 +76,19 @@
             <button class="dlink" onclick="download(event, '#clustersHist', 'clusters.svg')">Download</button>
             <p id="clusterData">Mean: , SD: </p>
         </div>
+        
+        <div id="completed" class="tabcontent" style="visibility: hidden">
+            <h3>Frequency of completed walks</h3>
+            <button class="dlink" onclick="download(event, '#completedHist', 'completed.svg')">Download</button>
+            <p id="completedData">Mean: , SD: </p>
+        </div>
     
         
         <script>
         function switchTab(evt, selectedTab) {
         
             //Make all other tabs invisible
-            var tabs = ["walks", "clusters"];
+            var tabs = ["walks", "clusters", "completed"];
             for(var i = 0; i < tabs.length; i++){
                 var element = document.getElementById(tabs[i]);
                 element.style.visibility = 'hidden';

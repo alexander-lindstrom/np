@@ -66,7 +66,7 @@ export function drawLine(svg, fromX, fromY, toX, toY, scaleI, scaleJ, type){
             x2: toX,
             y2: toY
         })
-    }
+}
 
 function intOnly(data){
     

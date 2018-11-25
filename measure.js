@@ -2,6 +2,7 @@ import * as main from './main.js'
 import * as config from './config.js'
 import * as draw from './draw.js'
 
+var busy = false;
 setSliders()
 setRunButton()
 
@@ -10,40 +11,53 @@ function setRunButton(){
     
     
     $("#runButton").button().click(function(){
-    
         
-        //Get slider values
-        var trials = $("#trials .slider").slider("value");
-        var width = $("#width .slider").slider("value");
-        var crowdPen = $("#crowdPen .slider").slider("value")/100;
-        var dirPen = $("#dirPen .slider").slider("value")/100;
-        var height = $("#height .slider").slider("value");
-        var axons = $("#axons .slider").slider("value");
-        var axonShare = $("#axonType .slider").slider("value")/100;
-       
-        //Kill any web worker
-        if (typeof(w) !== "undefined") {
-            w.terminate();
+        //Dont run if an animation is ongoing
+        if (!busy){
+                
+            toggleBusy();
+            //Get slider values
+            var trials = $("#trials .slider").slider("value");
+            var width = $("#width .slider").slider("value");
+            var crowdPen = $("#crowdPen .slider").slider("value")/100;
+            var dirPen = $("#dirPen .slider").slider("value")/100;
+            var height = $("#height .slider").slider("value");
+            var axons = $("#axons .slider").slider("value");
+            var axonShare = $("#axonType .slider").slider("value")/100;
+           
+            //Kill any web worker
+            if (typeof(w) !== "undefined") {
+                w.terminate();
+            }
+            
+            //Remove svgs
+            removeElement("gridSvg");
+            removeElement("walksHist");
+            removeElement("clustersHist");
+            
+            //Make tab stuff visible
+            var tab = document.getElementsByClassName("tab");
+            tab[0].style.visibility='visible';
+            document.getElementById("walks").style.visibility = 'visible';
+            document.getElementById("clusters").style.visibility = 'hidden';
+            
+            main.animate(width, height, axons, axonShare, crowdPen, dirPen);
+            startWorker(trials, width, height, axons, axonShare, config.steps, crowdPen, dirPen);
         }
         
-        //Remove svgs
-        removeElement("gridSvg");
-        removeElement("walksHist");
-        removeElement("clustersHist");
-        
-        //Make tab stuff visible
-        var tab = document.getElementsByClassName("tab");
-        tab[0].style.visibility='visible';
-        document.getElementById("walks").style.visibility = 'visible';
-        document.getElementById("clusters").style.visibility = 'hidden';
-        
-        main.animate(width, height, axons, axonShare, crowdPen, dirPen);
-        startWorker(trials, width, height, axons, axonShare, config.steps, crowdPen, dirPen);
-        
     }); 
-    $("#runButton").css({ width: '100px', 'padding-top': '10px', 'padding-bottom': '10px' });
-    
+    $("#runButton").css({ width: '100px', 'padding-top': '10px', 'padding-bottom': '10px' }); 
 }
+
+export function toggleBusy(){
+    if(busy){
+        busy = false;
+    }
+    else{
+        busy = true;
+    }
+}
+
 
 function startWorker(trials, width, height, axons, axonShare, steps, crowdPen, dirPen){
 
@@ -60,7 +74,8 @@ function startWorker(trials, width, height, axons, axonShare, steps, crowdPen, d
         
         var walks = e.data[0];
         var clusters = e.data[1];
-        
+        var completed = e.data[2];
+        var nonforward = e.data[3];
         
         draw.histogram(walks, "#walks", "walksHist");
         var mean = d3.mean(walks);
@@ -72,6 +87,12 @@ function startWorker(trials, width, height, axons, axonShare, steps, crowdPen, d
         var mean = d3.mean(clusters);
         var stdDev = d3.deviation(clusters);
         var clusterD = document.getElementById("clusterData");
+        clusterD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
+        
+        draw.histogram(completed, "#completed", "completedHist");
+        var mean = d3.mean(completed);
+        var stdDev = d3.deviation(completed);
+        var clusterD = document.getElementById("completedData");
         clusterD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
     }
 }
@@ -157,7 +178,7 @@ function setSliders(){
         max: 100,
         value: config.crowdPen*100,
         slide: function( event, ui ) {
-            $("#crowdPen .label").text("Crowding penalty: " + ui.value/100);
+            $("#crowdPen .label").text("Proximity penalty: " + ui.value/100);
         }
     });
     

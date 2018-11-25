@@ -1,7 +1,8 @@
-//Very ugly workaround
+//Very ugly workaround with duplicate code
 
 var walks = [];
 var clusters = [];
+var completed = [];
 
 
 
@@ -24,7 +25,7 @@ self.onmessage = function (msg) {
         simulate(grid, width, height, axons, axonShare, crowdPen, dirPen, steps);
         
     }
-    postMessage([walks, clusters]);
+    postMessage([walks, clusters, completed]);
     close();
 }
 
@@ -63,6 +64,7 @@ async function simulate(grid, width, height, axons, axonShare, crowdPen, dirPen,
     var axonTypes = setAxonTypes(axons, axonShare);                                                   
     var last = new Array(axons);
     var reached = new Array(axons);
+    var comp = 0;
     
     for(var i = 0; i < steps + 1; i++){
         positions[i] = new Array(axons)
@@ -97,6 +99,12 @@ async function simulate(grid, width, height, axons, axonShare, crowdPen, dirPen,
             [coords, penalties] = getNeighboors(grid, curr, height, width, 
                 dirPen)
             next = chooseStep(positions, coords, penalties, last[j], follows, j, i);
+            //Terminate if there was no acceptable step
+            if(!next){
+                reached[j] = true;
+                continue;
+            }
+            
             updateVisitedGrid(visitedGrid, next, j);
             moveTo(positions, next, i, j);
             updatePenalty(grid, startGrid, visitedGrid, next[0], next[1], crowdPen);
@@ -105,7 +113,9 @@ async function simulate(grid, width, height, axons, axonShare, crowdPen, dirPen,
             
             //Check if target has been reached for walker j
             if(targetReached(next, width)){
+                
                 reached[j] = true;
+                comp++;
             }
             last[j] = curr;  
         }
@@ -114,6 +124,7 @@ async function simulate(grid, width, height, axons, axonShare, crowdPen, dirPen,
         }
     }
     
+    completed.push(comp);
     measure(positions, follows, axons)
 }
 
@@ -254,12 +265,15 @@ function linspace(a, b, n) {
     return arr;
 }
 
-function measure(positions, follows, axons){
+function measure(positions, follows, axons,){
     
     getWalkLengths(positions, axons);
     getBundleSizes(follows, axons);
+    //getNonForwardSteps();
     
 }
+
+
 
 function getBundleSizes(follows, axons){
    
@@ -356,6 +370,10 @@ function chooseStep(positions, coords, penalties, last, follows, selfId, iterati
             min = penalties[i];
             index = i;
         }
+    }
+    //Return false if there is no acceptable step
+    if(min >= 1){
+        return false
     }
     return coords[index]
 }
