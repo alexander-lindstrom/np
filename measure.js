@@ -83,17 +83,18 @@ function startWorker(trials, width, height, axons, axonShare, steps, crowdPen, d
         var walksD = document.getElementById("walksData");
         walksD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
         
-        draw.histogram(clusters, "#clusters", "clustersHist");
-        var mean = d3.mean(clusters);
-        var stdDev = d3.deviation(clusters);
-        var clusterD = document.getElementById("clusterData");
-        clusterD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
-        
         draw.histogram(completed, "#completed", "completedHist");
         var mean = d3.mean(completed);
         var stdDev = d3.deviation(completed);
         var clusterD = document.getElementById("completedData");
         clusterD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
+        
+        draw.histogram(clusters, "#clusters", "clustersHist");
+        var mean = d3.mean(clusters);
+        var stdDev = d3.deviation(clusters);
+        var clusterD = document.getElementById("clusterData");
+        clusterD.innerHTML = "Mean: " + Number(mean.toFixed(2)) + ", SD: " + Number(stdDev.toFixed(2))
+
     }
 }
 
